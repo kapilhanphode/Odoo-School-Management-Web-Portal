@@ -1,0 +1,804 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="home_menu_dashboard" model="website.menu">
+        <field name="name">Home</field>
+        <field name="url">/my/home</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">25</field>
+    </record>
+
+    <record id="menu_dashboard" model="website.menu">
+        <field name="name">My Dashboard</field>
+        <field name="url">/mydashboard/</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" type="int">10</field>
+    </record>
+
+    <template id="portal_my_home" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="url">/studentlist</t>
+                <t t-set="title">Student Registration</t>
+                <t t-set="placeholder_count" t-value="'student_registered_count'"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="portal_layout" name="Portal layout: project menu entry" inherit_id="portal.portal_breadcrumbs"
+              priority="40">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'student_registration_list_view'"
+                t-attf-class="breadcrumb-item #{'active ' if not student_registration_list_view else ''}">
+                <a t-if="student1" t-attf-href="/studentlist?{{ keep_query() }}">Students</a>
+                <t t-else="">Students</t>
+            </li>
+            <li t-if="student1" class="breadcrumb-item active text-truncate">
+                <span t-field="student1.student_name"/>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_student_registration_list_view" name="Student Registration Portal List View">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Hospital Appointment</t>
+            </t>
+            <t t-if="not student_registration1">
+                <p class="text-danger">There are currently no Student Register</p>
+            </t>
+
+            <form action="/studform" method="post">
+                <!-- put other forms field here if you need to pass info to controller -->
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+            <!--
+            <div class="form-group row">
+                        <div class="col-sm-10">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </div>-->
+
+            <t t-if="student_registration1" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>
+                            <span class='d-none d-md-inline'>id</span>
+                        </th>
+                        <th class="text-center">Student Name</th>
+                        <th class="text-center">Phone No.</th>
+                        <th class="text-center">Email</th>
+                        <th class="text-center">Gender</th>
+                    </tr>
+                </thead>
+                <t t-foreach="student_registration1" t-as="sr1">
+                    <tr>
+                        <td>
+                            <a t-attf-href="/studentlist/{{slug(sr1)}}">
+                                <t t-esc="sr1.id"/>
+                            </a>
+                        </td>
+
+                        <td class="text-center">
+                            <a t-attf-href="/studentlist/{{slug(sr1)}}">
+                                <t t-esc="sr1.student_name"/>
+                            </a>
+                        </td>
+                        <td class="text-center">
+                            <span t-field="sr1.student_phone_no"/>
+                        </td>
+                        <td class="text-center">
+                            <span t-field="sr1.student_email"/>
+                        </td>
+                        <td class="text-center">
+                            <span t-field="sr1.student_gender"/>
+                        </td>
+                    </tr>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="student_form_view_portal" inherit_id="portal.portal_sidebar" name="Student Registration form View">
+        <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+            <t t-if="page_name == 'student_registration_list_view'">
+                <section style="background-color: #eee;">
+                    <div class="container py-5">
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Student Name</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_name"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Phone No.</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_phone_no"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Email</p>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_email"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Gender</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_gender"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Marital Status</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.marital_status"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Student Reg. Date</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_reg_date"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Date of Birth</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_dob"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Age</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_age"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Address</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_address"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body">
+                                    <t t-if="student1.marital_status == 'single'">
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <p class="mb-2">Parent Details</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Name</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.parent_name"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Phone</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.parent_phone_no"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </t>
+
+                                    <t t-if="student1.marital_status == 'married'">
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <p class="mb-2">Partner Details</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Name</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.partner_name"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Phone</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.partner_phone_no"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </t>
+
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Admission Type</p>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.student_admission_type"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <hr></hr>
+
+
+                                        <t t-if="student1.student_admission_type == 'school'">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <p class="mb-0">Student Class</p>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <p class="text-muted mb-0">
+                                                        <t t-out="student1.stud_class"/>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <hr></hr>
+                                        </t>
+
+                                        <t t-if="student1.student_admission_type == 'jr_college' or student1.student_admission_type == 'graduation' or student1.student_admission_type == 'post_graduation'">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <p class="mb-0">Clg Stream</p>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <p class="text-muted mb-0">
+                                                        <t t-out="student1.clg_stream"/>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <hr></hr>
+                                        </t>
+
+                                        <t t-if="student1.student_admission_type == 'jr_college'">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <p class="mb-0">Student Class</p>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <p class="text-muted mb-0">
+                                                        <t t-out="student1.teaching_jr_class"/>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <hr></hr>
+                                        </t>
+
+                                        <t t-if="student1.student_admission_type == 'graduation'">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <p class="mb-0">Graduation</p>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <p class="text-muted mb-0">
+                                                        <t t-out="student1.graduation_clg_stream"/>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <hr></hr>
+                                        </t>
+
+                                        <t t-if="student1.student_admission_type == 'post_graduation'">
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <p class="mb-0">Post Graduation</p>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <p class="text-muted mb-0">
+                                                        <t t-out="student1.post_graduation_clg_stream"/>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <hr></hr>
+                                        </t>
+
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <p class="mb-0">Class Teacher</p>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <p class="text-muted mb-0">
+                                                    <t t-out="student1.class_teacher.teacher_name"/>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="container py-5">
+                        <h1>History</h1>
+                        <t t-call="portal.message_thread">
+                            <t t-set="object" t-value="student1"/>
+                        </t>
+                    </div>
+
+                </section>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="student_registration_form">
+        <t t-call="portal.portal_layout">
+            <t t-call="portal.portal_table">
+
+                <div id="student_registration">
+                    <form method="post" action="/studfromsubmit"><!--action="/create/student"-->
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body">
+
+                                    <div class="row">
+
+                                        <label class="col-sm-5 col-form-label" for="name">Student Name</label>
+                                        <div class="col-sm-5">
+                                            <p class="text-muted mb-2">
+                                                <input type="char" name="student_name" id="name" class="form-control"
+                                                       placeholder="Student Name"/>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+
+                                        <label class="col-sm-5 col-form-label" for="name">Phone No.</label>
+                                        <div class="col-sm-5">
+                                            <p class="text-muted mb-2">
+                                                <input type="char" name="student_phone" id="phone" class="form-control"
+                                                       placeholder="Student Phone No."/>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+
+                                        <label class="col-sm-5 col-form-label" for="name">Email</label>
+                                        <div class="col-sm-5">
+                                            <p class="text-muted mb-2">
+                                                <input type="char" name="student_email" id="email" class="form-control"
+                                                       placeholder="Student Email"/>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <label class="col-sm-5 col-form-label" for="gender">Gender</label>
+                                        <div class="col-sm-5 mb-2">
+                                            <select name="student_gender" class="form-control link-style">
+                                                <option value=""></option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-sm-5 col-form-label" for="name">Marital Status</label>
+                                        <div class="col-sm-5 mb-2">
+                                            <select name="student_mart_status" class="form-control link-style">
+                                                <option value=""></option>
+                                                <option value="single">Single</option>
+                                                <option value="married">Married</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-10">
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-6">
+                                <div class="card-body mb-2">
+
+                                    <div class="row">
+                                        <label class="col-sm-5 col-form-label" for="name">Student Age</label>
+                                        <div class="col-sm-5 mb-2">
+                                            <input type="number" name="student_age" id="stud_age"
+                                                   class="form-control"
+                                                   placeholder="Student Age"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-sm-5 col-form-label" for="name">Address</label>
+                                        <div class="col-sm-5 mb-2">
+                                            <input type="char" name="student_address" id="stud_address"
+                                                   class="form-control"
+                                                   placeholder="Student Address"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <input type="char" name="student_age" id="stud_age"
+                                       class="form-control"
+                                       placeholder="Student Age"/>
+                                <div class="admission-type card-body">
+                                    <div class="row">
+                                        <label class="col-sm-5 col-form-label" for="name">Admission Type</label>
+                                        <div>
+                                            <input type="radio" id="school" name="remediation_type" value="school"/>
+                                            <label class="hideStudentClass mb-2" for="school">School</label>
+                                            <input type="radio" id="jr_college" name="remediation_type"
+                                                   value="jr_college"/>
+                                            <label for="jr_college" class="showStudentClass">Jr. College</label>
+                                            <input type="radio" id="graduation" name="remediation_type"
+                                                   value="graduation"/>
+                                            <label for="graduation" class="showStudentClass">Graduation</label>
+                                            <input type="radio" id="post_graduation" name="remediation_type"
+                                                   value="post_graduation"/>
+                                            <label for="post_graduation" class="showStudentClass">Post Graduation
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div id="studentClassOptions">
+                                        <label class="col-sm-5 col-form-label" for="name">Student Class</label>
+                                        <div>
+                                            <input type="radio" id="option1" name="options" value="cls1_4"/>
+                                            <label for="option1">Class 1-4</label>
+
+                                            <input type="radio" id="option2" name="options" value="cls5_7"/>
+                                            <label for="option2">Class 5-7</label>
+
+                                            <input type="radio" id="option3" name="options" value="cls8_9"/>
+                                            <label for="option3">Class 8-9</label>
+
+                                            <input type="radio" id="option4" name="options" value="cls10"/>
+                                            <label for="option3">Class 10</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="studentClassOptions11_12">
+
+                                        <label class="col-sm-5 col-form-label" for="name">Student Class</label>
+                                        <div>
+                                            <input type="radio" id="class11" name="options" value="cls11"/>
+                                            <label for="option1">Class 11</label>
+
+                                            <input type="radio" id="class12" name="options" value="cls12"/>
+                                            <label for="option2">Class 12</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="studentclgstream">
+                                        <label class="col-sm-5 col-form-label" for="name">Clg Stream</label>
+
+                                        <div>
+                                            <input type="radio" id="science" name="options" value="science"/>
+                                            <label for="option1">Science</label>
+
+                                            <input type="radio" id="commerce" name="options" value="commerce"/>
+                                            <label for="option2">Commerce</label>
+
+                                            <input type="radio" id="arts" name="options" value="arts"/>
+                                            <label for="option3">Arts</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="studentgraduation">
+                                        <label class="col-sm-5 col-form-label" for="name">Graduation</label>
+
+                                        <div>
+                                            <input type="radio" id="bcom" name="options" value="b_com"/>
+                                            <label for="option1">B.Com</label>
+
+                                            <input type="radio" id="ba" name="options" value="b_a"/>
+                                            <label for="option2">B.A</label>
+
+                                            <input type="radio" id="bsc" name="options" value="bsc"/>
+                                            <label for="option3">BSC(Bachelor of Science)</label>
+
+                                            <input type="radio" id="bca" name="options" value="bca"/>
+                                            <label for="option4">BCA(Bachelor of Computer Application)</label>
+
+                                            <input type="radio" id="bcs" name="options" value="bcs"/>
+                                            <label for="option5">BCS(Bachelor of Computer Science)</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="studentpostgraduation">
+                                        <label class="col-sm-5 col-form-label" for="name">Post Graduation</label>
+
+                                        <div>
+                                            <input type="radio" id="mcom" name="options" value="m_com"/>
+                                            <label for="option1">M.Com</label>
+
+                                            <input type="radio" id="ma" name="options" value="m_a"/>
+                                            <label for="option2">M.A</label>
+
+                                            <input type="radio" id="msc" name="options" value="msc"/>
+                                            <label for="option3">MSC(Master's of Science)</label>
+
+                                            <input type="radio" id="mca" name="options" value="mca"/>
+                                            <label for="option4">MCA(Master's of Computer Application)</label>
+
+                                            <input type="radio" id="mcs" name="options" value="mcs"/>
+                                            <label for="option5">MCS(Master's of Computer Science)</label>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </t>
+        </t>
+        <!--
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"/>
+        -->
+        <script type="text/javascript" src="/web/static/lib/jquery/jquery.js"/>
+
+
+
+
+            <script type="text/javascript">
+
+                $(document).ready(function() {
+        // Initially hide all student class options
+        $("#studentClassOptions, #studentClassOptions11_12, #studentclgstream, #studentgraduation, #studentpostgraduation").hide();
+
+        // Attach a change event handler to the "Admission Type" radio buttons
+        $("input[name='remediation_type']").change(function() {
+            // Hide all student class options
+            $("#studentClassOptions, #studentClassOptions11_12, #studentclgstream, #studentgraduation, #studentpostgraduation").hide();
+
+            // Get the value of the selected "Admission Type"
+            var selectedType = $("input[name='remediation_type']:checked").val();
+
+            // Show the corresponding student class options based on the selected "Admission Type"
+            if (selectedType === "school") {
+                $("#studentClassOptions").show();
+            } else if (selectedType === "jr_college" || selectedType === "graduation" || selectedType === "post_graduation") {
+                if (selectedType === "jr_college") {
+                    $("#studentClassOptions11_12").show();
+                } else if (selectedType === "graduation") {
+                    $("#studentgraduation").show();
+                } else if (selectedType === "post_graduation") {
+                    $("#studentpostgraduation").show();
+                }
+                $("#studentclgstream").show();
+            }
+        });
+    });
+
+    <!--// Function to show/hide sections based on the selected admission type
+    function updateSectionsVisibility() {
+        var admissionType = document.querySelector('input[name="remediation_type"]:checked').value;
+
+        // Get references to the section div elements
+        var studentClassOptions = document.getElementById('studentClassOptions');
+        var studentClassOptions11_12 = document.getElementById('studentClassOptions11_12');
+        var studentclgstream = document.getElementById('studentclgstream');
+        var studentgraduation = document.getElementById('studentgraduation');
+        var studentpostgraduation = document.getElementById('studentpostgraduation');
+
+        // Hide all sections
+        studentClassOptions.style.display = 'none';
+        studentClassOptions11_12.style.display = 'none';
+        studentclgstream.style.display = 'none';
+        studentgraduation.style.display = 'none';
+        studentpostgraduation.style.display = 'none';
+
+        // Show the relevant section based on the admission type
+        if (admissionType === 'school') {
+            studentClassOptions.style.display = 'block';
+        } else if (admissionType === 'jr_college') {
+            studentclgstream.style.display = 'block';
+            studentClassOptions11_12.style.display = 'block';
+        } else if (admissionType === 'graduation') {
+            studentclgstream.style.display = 'block';
+            studentgraduation.style.display = 'block';
+        } else if (admissionType === 'post_graduation') {
+            studentclgstream.style.display = 'block';
+            studentpostgraduation.style.display = 'block';
+        }
+    }
+
+    // Attach the function to the change event of the admission type radio buttons
+    var admissionTypeRadios = document.getElementsByName('remediation_type');
+    for (var i = 0; i &lt; admissionTypeRadios.length; i++) {
+        admissionTypeRadios[i].addEventListener('change', updateSectionsVisibility);
+    }
+
+    // Initial execution to set the initial visibility based on the default selected radio button
+    updateSectionsVisibility();-->
+
+
+            <!--$(document).ready(function() {
+            $('#my_button').on('click', function() {
+            alert("Button clicked!");
+            // Add any other JavaScript functionality here
+            });
+            });-->
+        </script>
+
+    </template>
+
+
+    <!--
+        <script type="text/javascript">
+        $(document).ready(function () {
+            // Function to toggle the visibility of the "Student Class" field
+            function toggleStudentClassField() {
+                var remediationType = $("input[name='remediation_type']:checked").val();
+                if (remediationType === "school") {
+                    // Hide the "Student Class" field
+                    $("select[name='student_admission_type']").closest('.col-sm-5').hide();
+                } else {
+                    // Show the "Student Class" field
+                    $("select[name='student_admission_type']").closest('.col-sm-5').show();
+                }
+            }
+
+            // Initial call to set field visibility based on the default selected radio button
+            toggleStudentClassField();
+
+            // Attach an event listener to the radio buttons to update the field visibility when the selection changes
+            $("input[name='remediation_type']").change(function () {
+                toggleStudentClassField();
+            });
+        });
+    </script>
+    -->
+
+
+    <!--    -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+    <!--    -&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;-->
+
+    <data>
+        <record id="menu_partner_form" model="website.menu">
+            <!--        #here record id is the unique id of your record and model is the ‘website.menu’ of the website.-->
+            <field name="name">Register Student</field>
+            <!--            #here mention the name of the menu to appear.-->
+            <field name="url">/student/form</field>
+            <!--            #here mention the url of the website to be redirected after clicking. This is a controller.-->
+            <field name="parent_id" ref="website.main_menu"/>
+            <!--            #here mention the parent id of the menu which we are inheriting.-->
+            <field name="sequence" type="int">22</field>
+        </record>
+    </data>
+
+    <template id="student_form" name="Student Form">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container">
+                    <div class="col-md-12">
+                        <form action="/student/form/submit">
+                            <!--                         #url/controller to called on the form action.-->
+                            <div class="form-group">
+                                <label for="name">Name:</label>
+                                <input type="text" class="form-control" name="student_name" id="name" required="true"/>
+                                <!--                          #label and id of the fields to be created in the form.These fields should be present in the model for the entry of the data into the database.#-->
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Phone:</label>
+                                <input type="text" class="form-control" name="student_phone_no"
+                                       id="phone" required="true"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email address:</label>
+                                <input type="email" class="form-control" name="student_email"
+                                       id="email" required="true"/>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <record id="your_js_id" model="ir.ui.view">
+        <field name="name">Your JavaScript</field>
+        <field name="type">qweb</field>
+        <field name="arch" type="xml">
+            <script type="text/javascript" src="/school_management_web_portal/static/src/js/patient_validation.js"/>
+        </field>
+    </record>
+
+    <template id="student_form_success" name="Student Form Successfully Submitted">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container">
+                    <div class="col-md-12">
+                        <div class="alert alert-success">
+                            Student created successfully.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
