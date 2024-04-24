@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-llllllll
     <record id="home_menu_dashboard" model="website.menu">
         <field name="name">Home</field>
         <field name="url">/my/home</field>
